@@ -15,16 +15,49 @@ export TEXTDOMAINDIR="/usr/share/locale"
 export TEXTDOMAIN=big-store
 
 TMP_FOLDER="/tmp/bigstore"
-COUNT=0
+#COUNT=0
 rm -f ${TMP_FOLDER}/aurbuild.html
-OIFS=$IFS
-IFS=$'\n'
+#OIFS=$IFS
+#IFS=$'\n'
 PKG="$@"
 
-for i  in  $(LANGUAGE=C yay -a -Sii $@ | grep -e ^Name -e ^Version -e ^Description | cut -f2-10 -d":" | awk '{if (NR%3) {ORS="";print "|"$0} else {ORS="\n";print "|"$0}}' | sed 's/^| //g;s/| /|/g'); do
-    TITLE="$(echo "$i" | cut -f1 -d"|")"
-    VERSION="$(echo "$i"| cut -f2 -d"|")"
-    DESCRIPTION="$(echo "$i" | cut -f3 -d"|")"
+# ./category_aur.sh $(cat /tmp/bigstore/category_aur.txt | tr "\n" " ") > /dev/null 2>&1
+
+# LANGUAGE=C yay -a -Sii $(cat /tmp/bigstore/category_aur.txt | tr "\n" " ")
+
+LANGUAGE=C yay -a -Sii $@ | \
+gawk ''
+## Remover uma das aspas
+
+#BEGIN {
+#    FS = " +: "
+#}
+
+!$0 {
+    title = version = description = installed = ""
+}
+
+/^Name/ {
+    title = gensub(/^Name +: /,"",1)
+    not_installed = system("pacman -Q " title)
+    if ( not_installed ) {
+        idaur = "id=\"AurP2\">"
+}
+
+/^Version/ {
+    version = gensub(/^Version +: /,"",1)
+}
+
+/^Description/ {
+    description = gensub(/^Description +: /,"",1)
+}
+
+
+
+#for i  in  $(LANGUAGE=C yay -a -Sii $@ | grep -e ^Name -e ^Version -e ^Description | cut -f2-10 -d":" | awk '{if (NR%3) {ORS="";print "|"$0} else {ORS="\n";print "|"$0}}' | sed 's/^| //g;s/| /|/g'); do
+#    TITLE="$(echo "$i" | cut -f1 -d"|")"
+#    VERSION="$(echo "$i"| cut -f2 -d"|")"
+#    DESCRIPTION="$(echo "$i" | cut -f3 -d"|")"
     INSTALLED="$(pacman -Q "$TITLE" 2> /dev/null)"
     echo "<a onclick=\"disableBody();\" href=\"view_aur.sh.htm?pkg_name=$TITLE\">" >> ${TMP_FOLDER}/aurbuild.html
     echo '<div class="col s12 m6 l3"' >> ${TMP_FOLDER}/aurbuild.html
