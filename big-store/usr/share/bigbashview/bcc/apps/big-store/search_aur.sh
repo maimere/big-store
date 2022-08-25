@@ -109,17 +109,18 @@ BEGIN{
 "<div id=box_aur_desc><div id=aur_desc>" description "</div></div>",
 button) > tmpfolder "/aurbuild.html"
 
+        count++
     }
 }
 
 # Stops right after the 60th package
-NR == 60 { exit }
+count == 60 { exit }
 
 
 
 END {
 
-    if (NR > 0) {
+    if (count > 0) {
         print("<script>$(document).ready(function() {$(\"#box_aur\").show();});</script>",
               "<script>document.getElementById(\"aur_icon_loading\").innerHTML = \"\"; runAvatarAur();</script>") > tmpfolder "/aurbuild.html"
     } else {
@@ -127,7 +128,7 @@ END {
     }
 
 # Writes on aur_number.html the number of packages read
-    print NR > tmpfolder "/aur_number.html"
+    print count > tmpfolder "/aur_number.html"
 
 }
 
